@@ -567,6 +567,7 @@ class FileBrowserSite(object):
                 old_file = smart_text(file_path)
                 new_file = smart_text(uploadedfile)
                 self.storage.move(new_file, old_file, allow_overwrite=True)
+                file_name = old_file  # otherwise file_name will be missing self.directory (e.g. 'uploads/')
             else:
                 file_name = smart_text(uploadedfile)
                 filedata.name = os.path.relpath(file_name, path)
