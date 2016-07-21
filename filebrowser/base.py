@@ -13,7 +13,7 @@ import warnings
 from django.core.files import File
 
 # FILEBROWSER IMPORTS
-from filebrowser.settings import EXTENSIONS, VERSIONS, ADMIN_VERSIONS, VERSIONS_BASEDIR, VERSION_QUALITY, PLACEHOLDER, FORCE_PLACEHOLDER, SHOW_PLACEHOLDER, STRICT_PIL, IMAGE_MAXBLOCK
+from filebrowser.settings import EXTENSIONS, VERSIONS, ADMIN_VERSIONS, VERSIONS_BASEDIR, VERSION_QUALITY, PLACEHOLDER, FORCE_PLACEHOLDER, SHOW_PLACEHOLDER, STRICT_PIL, IMAGE_MAXBLOCK, MEDIA_URL
 from filebrowser.utils import path_strip, scale_and_crop
 from django.utils.encoding import smart_str, smart_text
 
@@ -225,7 +225,10 @@ class FileObject():
         if platform.system() == 'Windows':
             self.path = path.replace('\\', '/')
         else:
-            self.path = path
+            if path.lower().startswith(MEDIA_URL.lower()):
+                self.path = path[len(MEDIA_URL):]
+            else:
+                self.path = path
         self.head = os.path.dirname(path)
         self.filename = os.path.basename(path)
         self.filename_lower = self.filename.lower()
@@ -341,6 +344,8 @@ class FileObject():
     @property
     def url(self):
         "URL for the file/folder as defined with site.storage"
+        if self.path and self.path.lower().startswith('http'):
+            return self.path
         return self.site.storage.url(self.path)
 
     # IMAGE ATTRIBUTES/PROPERTIES
